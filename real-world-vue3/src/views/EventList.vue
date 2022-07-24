@@ -8,6 +8,7 @@
 
 <script>
 // @ is an alias to /src
+import EventService from '@/services/EventService.js'
 import EventCard from '@/components/EventCard.vue'
 
 export default {
@@ -17,43 +18,15 @@ export default {
   },
   data(){
     return {
-      events: [
-      {
-        id: 1,
-        category: 'animal welfare',
-        title: 'Dog Adoption Day',
-        description: 'Find your new dog at this event',
-        location: 'Woof Town',
-        date: '19th August 2022',
-        time: '12:00',
-        petsAllowed: true,
-        organiser: 'Kat Laydee'
-      },
-      {
-        id: 2,
-        category: 'animal welfare',
-        title: 'Dog Adoption Day',
-        description: 'Find your new dog at this event',
-        location: 'Woof Town',
-        date: '19th August 2022',
-        time: '12:00',
-        petsAllowed: true,
-        organiser: 'Kat Laydee'
-      },
-      {
-        id: 3,
-        category: 'animal welfare',
-        title: 'Beach Cleanup',
-        description: 'Find your new dog at this event',
-        location: 'Woof Town',
-        date: '19th August 2022',
-        time: '12:00',
-        petsAllowed: true,
-        organiser: 'Kat Laydee'
-      },
- 
-      ]
+     events: null
     }
+  },
+  created(){
+    EventService.getEvents()
+    .then(resp => {
+      this.events = resp.data
+    })
+    .catch(err => console.log(err))
   }
 }
 </script>
