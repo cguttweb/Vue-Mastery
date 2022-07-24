@@ -49,14 +49,11 @@ const routes = [
     ]
   },
   {
-    path: '/event/:id',
-    redirect: () => {
-      return { name: 'EventDetails' }
-    },
-    children: [
-      { path: 'register', redirect: () => ({ name: 'EventRegister' })},
-      { path: 'edit', redirect: () => ({ name: 'EventEdit' })}
-    ]
+    // * is used to include / in the match as it doesn't by default
+    path: '/event/:afterEvent(.*)',
+    redirect: to => {
+      return { path: '/events/' + to.params.afterEvent }
+    }
   }
 ]
 
