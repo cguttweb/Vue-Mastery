@@ -4,16 +4,22 @@
     <h1>Events for Good</h1>
     <EventCard v-for="event in events" :key="event.id" :event="event" />
 
-    <router-link :to="{ name: 'EventList', query: { page: page - 1 } }"
-    rel="prev" 
-    v-if="page != 1">
-    Prev Page
-    </router-link>
-
-    <router-link :to="{ name: 'EventList', query: { page: page - 1 } }"
-    rel="prev" >
-    Next Page
-    </router-link>
+    <div class="pagination">
+      <router-link
+        id="page-prev"
+        :to="{ name: 'EventList', query: { page: page - 1 } }"
+        rel="prev"
+        v-if="page != 1">
+        &#60; Prev
+      </router-link>
+      <router-link
+        id="page-next"
+        :to="{ name: 'EventList', query: { page: page + 1 } }"
+        rel="prev"
+        v-if="hasNextPage">
+        Next &#62;
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -21,7 +27,7 @@
 // @ is an alias to /src
 import EventService from '@/services/EventService.js'
 import EventCard from '@/components/EventCard.vue'
-// import { watchEffect } from 'vue'
+import { watchEffect } from 'vue'
 
 export default {
   name: 'EventList',
@@ -31,16 +37,29 @@ export default {
   },
   data(){
     return {
-     events: null
+     events: null,
+     totalEvents: 0
     }
   },
   created(){
-    // 2 = number per page and this.page = current page
-    EventService.getEvents(2, this.page)
-    .then(resp => {
-      this.events = resp.data
+    watchEffect(() => {
+      this.events = null // clears events on the page
+      // 2 = number per page and this.page = current page which is reactive
+      EventService.getEvents(2, this.page)
+      .then(response => {
+        this.events = response.data
+        this.totalEvents = response.headers['x-total-count']
+      })
+      .catch(err => console.log(err))
     })
-    .catch(err => console.log(err))
+  },
+  computed: {
+    hasNextPage(){
+      // find total number of pages
+      var totalPages = Math.ceil(this.totalEvents / 2)
+      // if not last page
+      return this.page < totalPages
+    }
   }
 }
 </script>
@@ -50,5 +69,23 @@ export default {
   align-items: center;
   display: flex;
   flex-direction: column;
+}
+
+.pagination {
+  display: flex;
+  width: 300px;
+}
+
+.pagination a {
+  flex: 1;
+  text-decoration: none;
+}
+
+#page-prev {
+  text-align: left;
+}
+
+#page-next {
+  text-align: right;
 }
 </style>
