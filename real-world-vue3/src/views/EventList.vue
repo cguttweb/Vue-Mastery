@@ -7,6 +7,12 @@
     <router-link :to="{ name: 'EventList', query: { page: page - 1 } }"
     rel="prev" 
     v-if="page != 1">
+    Prev Page
+    </router-link>
+
+    <router-link :to="{ name: 'EventList', query: { page: page - 1 } }"
+    rel="prev" >
+    Next Page
     </router-link>
   </div>
 </template>
@@ -15,6 +21,7 @@
 // @ is an alias to /src
 import EventService from '@/services/EventService.js'
 import EventCard from '@/components/EventCard.vue'
+// import { watchEffect } from 'vue'
 
 export default {
   name: 'EventList',
