@@ -5,6 +5,8 @@ import EventDetails from '@/views/event/Details.vue'
 import EventEdit from '@/views/event/Edit.vue'
 import EventRegister from '@/views/event/Register.vue'
 import EventLayout from '@/views/event/Layout.vue'
+import NotFound from '@/views/NotFound.vue'
+import NetworkError from '@/views/NetworkError.vue'
 
 const routes = [
   {
@@ -13,17 +15,6 @@ const routes = [
     component: EventList,
     props: route => ({ page: parseInt(route.query.page) || 1})
   },
-  {
-    path: '/about-us',
-    name: 'About',
-    component: About,
-    // alias: '/about'
-  },
-  // redirecting - if concerned SEO this is probably better option
-  // {
-  //   path: '/about',
-  //   redirect: { name: About }
-  // },
   {
     // : indicates a dynamic segment
     path: '/events/:id',
@@ -54,6 +45,33 @@ const routes = [
     redirect: to => {
       return { path: '/events/' + to.params.afterEvent }
     }
+  },
+  {
+    path: '/about-us',
+    name: 'About',
+    component: About,
+    // alias: '/about'
+  },
+  // redirecting simple example - if concerned SEO this is probably better option
+  // {
+  //   path: '/about',
+  //   redirect: { name: About }
+  // },
+  {
+    path: '/:catchAll(.*)',
+    name: 'NotFound',
+    component: NotFound
+  },
+  {
+    path: '/404/:resource',
+    name: '404Resource',
+    component: NotFound,
+    props: true
+  },
+  {
+    path: '/network-error',
+    name: 'NetworkError',
+    component: NetworkError,
   }
 ]
 
