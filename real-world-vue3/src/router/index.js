@@ -7,13 +7,16 @@ import EventRegister from '@/views/event/Register.vue'
 import EventLayout from '@/views/event/Layout.vue'
 import NotFound from '@/views/NotFound.vue'
 import NetworkError from '@/views/NetworkError.vue'
+import NProgress from 'nprogress'
+import EventService from '@/services/EventService.js'
+import GStore from '@/store'
 
 const routes = [
   {
     path: '/',
     name: 'EventList',
     component: EventList,
-    props: route => ({ page: parseInt(route.query.page) || 1})
+    props: route => ({ page: parseInt(route.query.page) || 1 }),
   },
   {
     // : indicates a dynamic segment
@@ -21,30 +24,47 @@ const routes = [
     name: 'EventLayout',
     props: true,
     component: EventLayout,
+    beforeEnter: to => {
+      // fetch single event by id and set local data
+      return EventService.getEvent(to.params.id)
+        .then(resp => {
+          GStore.event = resp.data
+        })
+        .catch(err => {
+          if (err.response && err.response.status == 404) {
+            this.$router.push({
+              name: '404Resource',
+              params: { resource: 'event' },
+            })
+          } else {
+            return { name: 'NetworkError' }
+          }
+        })
+    },
     children: [
       {
         path: '',
         name: 'EventDetails',
-        component: EventDetails
+        component: EventDetails,
       },
       {
         path: 'edit',
         name: 'EventEdit',
-        component: EventEdit
+        component: EventEdit,
       },
       {
         path: 'register',
         name: 'EventRegister',
-        component: EventRegister
-      }
-    ]
+        component: EventRegister,
+      },
+    ],
   },
   {
     // * is used to include / in the match as it doesn't by default
     path: '/event/:afterEvent(.*)',
     redirect: to => {
       return { path: '/events/' + to.params.afterEvent }
-    }
+    },
   },
   {
     path: '/about-us',
@@ -60,24 +80,34 @@ const routes = [
   {
     path: '/:catchAll(.*)',
     name: 'NotFound',
-    component: NotFound
+    component: NotFound,
   },
   {
     path: '/404/:resource',
     name: '404Resource',
     component: NotFound,
-    props: true
+    props: true,
   },
   {
     path: '/network-error',
     name: 'NetworkError',
     component: NetworkError,
-  }
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
+})
+
+// start progress bar
+router.beforeEach(() => {
+  NProgress.start()
+})
+
+// end progress bar
+router.afterEach(() => {
+  NProgress.done()
 })
 
 export default router

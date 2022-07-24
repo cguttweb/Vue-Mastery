@@ -27,8 +27,6 @@
 // @ is an alias to /src
 import EventService from '@/services/EventService.js'
 import EventCard from '@/components/EventCard.vue'
-import NProgress from 'nprogress'
-
 
 export default {
   name: 'EventList',
@@ -43,7 +41,6 @@ export default {
     }
   },
   beforeRouteEnter (routeTo, routeFrom, next) {
-      NProgress.start()
       // 2 = number per page and this.page = current page which is reactive
       EventService.getEvents(2, parseInt(routeTo.query.page) || 1)
       .then(response => {
@@ -55,19 +52,18 @@ export default {
       })
       .catch(() => {
         next({ name: 'NetworkError' })
-      }).finally(() => NProgress.done())
+      })
   },
     beforeRouteUpdate (routeTo) {
-      NProgress.start()
       // 2 = number per page and this.page = current page which is reactive
-      EventService.getEvents(2, parseInt(routeTo.query.page) || 1)
+      return EventService.getEvents(2, parseInt(routeTo.query.page) || 1)
       .then(response => {
         this.events = response.data
         this.totalEvents = response.headers['x-total-count']
       })
       .catch(() => {
         return { name: 'NetworkError' }
-      }).finally(() => NProgress.done())
+      })
   },
   computed: {
     hasNextPage(){
