@@ -6,10 +6,18 @@
 <script>
 export default {
   props: ['event'],
+  inject: ['GStore'],
   methods: {
     register(){
       // call to API
-      // ig registered then redirect to event details
+      // if registered then redirect to event details
+
+      this.GStore.flashMessage = 'You are successfully registered for ' + this.event.title
+
+      setTimeout(() => {
+        this.GStore.flashMessage = ''
+      }, 2000)
+
       this.$router.push({
         name: 'EventDetails'
       })
